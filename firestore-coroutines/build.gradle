@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -33,12 +33,12 @@ kotlin {
 
 dependencies {
     // Kotlin
-    implementation "org.jetbrains.anko:anko-coroutines:0.10.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.anko:anko-coroutines:0.10.5"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.24.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin.core}"
 
     // Firebase
-    compileOnly 'com.google.firebase:firebase-firestore:11.8.0'
+    compileOnly 'com.google.firebase:firebase-firestore:17.1.0'
 
     // Testing
     testImplementation 'junit:junit:4.12'

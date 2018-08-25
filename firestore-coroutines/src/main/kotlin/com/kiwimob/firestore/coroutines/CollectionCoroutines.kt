@@ -8,7 +8,7 @@ import kotlinx.coroutines.experimental.NonCancellable
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
 
 suspend fun <T : Any> CollectionReference.await(clazz: Class<T>): List<T> {
-    return await { documentSnapshot -> documentSnapshot.toObject(clazz) }
+    return await { documentSnapshot -> documentSnapshot.toObject(clazz) as T }
 }
 
 suspend fun <T : Any> CollectionReference.await(parser: (documentSnapshot: DocumentSnapshot) -> T): List<T> {
