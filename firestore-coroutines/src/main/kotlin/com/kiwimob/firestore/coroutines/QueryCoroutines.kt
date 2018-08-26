@@ -24,7 +24,7 @@ suspend fun Query.await(): QuerySnapshot {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -48,7 +48,7 @@ suspend fun <T : Any> Query.await(parser: (documentSnapshot: DocumentSnapshot) -
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -69,7 +69,7 @@ suspend fun <T : Any> Query.awaitSingle(parser: (documentSnapshot: DocumentSnaps
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()

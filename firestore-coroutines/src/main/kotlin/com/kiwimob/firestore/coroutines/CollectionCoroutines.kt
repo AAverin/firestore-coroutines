@@ -24,7 +24,7 @@ suspend fun <T : Any> CollectionReference.await(parser: (documentSnapshot: Docum
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -35,9 +35,10 @@ suspend fun <T : Any> CollectionReference.await(parser: (documentSnapshot: Docum
     }
 }
 
-suspend fun CollectionReference.await() : QuerySnapshot {
+suspend fun CollectionReference.await(): QuerySnapshot {
     return suspendCancellableCoroutine { continuation ->
-        get().addOnCompleteListener {
+
+        get().addOnCompleteListener() {
             if (it.isSuccessful) {
                 continuation.resume(it.result)
             } else {
@@ -45,14 +46,16 @@ suspend fun CollectionReference.await() : QuerySnapshot {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
                 } catch (ex: Throwable) {
                     //Ignore cancel exception
+                    ex.printStackTrace()
                 }
         }
+
     }
 }
 
@@ -66,7 +69,7 @@ suspend fun CollectionReference.addAwait(value: Any): DocumentReference {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -87,7 +90,7 @@ suspend fun CollectionReference.addAwait(value: Map<String, Any>): DocumentRefer
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
