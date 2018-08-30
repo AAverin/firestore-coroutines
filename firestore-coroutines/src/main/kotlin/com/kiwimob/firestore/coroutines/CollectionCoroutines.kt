@@ -5,6 +5,10 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.experimental.NonCancellable
+import kotlinx.coroutines.experimental.channels.Channel
+import kotlinx.coroutines.experimental.channels.ReceiveChannel
+import kotlinx.coroutines.experimental.channels.sendBlocking
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
 
 suspend fun <T : Any> CollectionReference.await(clazz: Class<T>): List<T> {
@@ -33,6 +37,36 @@ suspend fun <T : Any> CollectionReference.await(parser: (documentSnapshot: Docum
                 }
         }
     }
+}
+
+suspend fun <T : Any> CollectionReference.listen(clazz: Class<T>): ReceiveChannel<List<T>> = listen { documentSnapshot ->
+    documentSnapshot.toObject(clazz) as T
+}
+
+
+suspend fun <T : Any> CollectionReference.listen(parser: (documentSnapshot: DocumentSnapshot) -> T): ReceiveChannel<List<T>> {
+    val channel = Channel<List<T>>()
+
+    launch {
+        addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+            firebaseFirestoreException?.let {
+                channel.close(it)
+                return@addSnapshotListener
+            }
+            if (querySnapshot == null) {
+                channel.close()
+                return@addSnapshotListener
+            }
+
+            val list = arrayListOf<T>()
+            querySnapshot.forEach {
+                list.add(parser.invoke(it))
+            }
+            channel.sendBlocking(list)
+        }
+    }
+
+    return channel
 }
 
 suspend fun CollectionReference.await(): QuerySnapshot {
