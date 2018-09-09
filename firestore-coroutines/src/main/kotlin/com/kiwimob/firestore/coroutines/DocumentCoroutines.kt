@@ -8,10 +8,10 @@ import kotlinx.coroutines.experimental.NonCancellable
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
 
 suspend fun <T : Any> DocumentReference.await(clazz: Class<T>): T {
-    return await { documentSnapshot -> documentSnapshot.toObject(clazz) }
+    return await { documentSnapshot -> documentSnapshot.toObject(clazz) as T }
 }
 
-suspend fun <T : Any> DocumentReference.await(parser: (documentSnapshot: DocumentSnapshot) -> T): T {
+suspend fun <T : Any?> DocumentReference.await(parser: (documentSnapshot: DocumentSnapshot) -> T): T {
     return suspendCancellableCoroutine { continuation ->
         get().addOnCompleteListener {
             if (it.isSuccessful) {
@@ -21,7 +21,7 @@ suspend fun <T : Any> DocumentReference.await(parser: (documentSnapshot: Documen
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -42,7 +42,7 @@ suspend fun DocumentReference.await(): DocumentSnapshot {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -63,7 +63,7 @@ suspend fun DocumentReference.deleteAwait() {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -84,7 +84,7 @@ suspend fun DocumentReference.updateAwait(var1: Map<String, Any>) {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -105,7 +105,7 @@ suspend fun DocumentReference.updateAwait(var1: FieldPath, var2: Any, var3: List
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -116,7 +116,7 @@ suspend fun DocumentReference.updateAwait(var1: FieldPath, var2: Any, var3: List
     }
 }
 
-suspend fun DocumentReference.updateAwait(var1: String, var2 : Any, var3: List<Any>) {
+suspend fun DocumentReference.updateAwait(var1: String, var2: Any, var3: List<Any>) {
     return suspendCancellableCoroutine { continuation ->
         update(var1, var2, var3).addOnCompleteListener {
             if (it.isSuccessful) {
@@ -126,7 +126,7 @@ suspend fun DocumentReference.updateAwait(var1: String, var2 : Any, var3: List<A
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -147,7 +147,7 @@ suspend fun DocumentReference.setAwait(var1: Any) {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -169,7 +169,7 @@ suspend fun DocumentReference.setAwait(var1: Map<String, Any>) {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -180,7 +180,7 @@ suspend fun DocumentReference.setAwait(var1: Map<String, Any>) {
     }
 }
 
-suspend fun DocumentReference.setAwait(var1: Any, var2 : SetOptions) {
+suspend fun DocumentReference.setAwait(var1: Any, var2: SetOptions) {
     return suspendCancellableCoroutine { continuation ->
         set(var1, var2).addOnCompleteListener {
             if (it.isSuccessful) {
@@ -190,7 +190,7 @@ suspend fun DocumentReference.setAwait(var1: Any, var2 : SetOptions) {
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
@@ -211,7 +211,7 @@ suspend fun DocumentReference.setAwait(var1: Map<String, Any>, var2: SetOptions)
             }
         }
 
-        continuation.invokeOnCompletion {
+        continuation.invokeOnCancellation {
             if (continuation.isCancelled)
                 try {
                     NonCancellable.cancel()
