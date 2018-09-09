@@ -1,9 +1,6 @@
 package com.kiwimob.firestore.coroutines
 
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import kotlinx.coroutines.experimental.NonCancellable
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.channels.ReceiveChannel
@@ -39,12 +36,12 @@ suspend fun <T : Any> CollectionReference.await(parser: (documentSnapshot: Docum
     }
 }
 
-suspend fun <T : Any> CollectionReference.listen(clazz: Class<T>): ReceiveChannel<List<T>> = listen { documentSnapshot ->
+suspend fun <T : Any> Query.listen(clazz: Class<T>): ReceiveChannel<List<T>> = listen { documentSnapshot ->
     documentSnapshot.toObject(clazz) as T
 }
 
 
-suspend fun <T : Any> CollectionReference.listen(parser: (documentSnapshot: DocumentSnapshot) -> T): ReceiveChannel<List<T>> {
+suspend fun <T : Any> Query.listen(parser: (documentSnapshot: DocumentSnapshot) -> T): ReceiveChannel<List<T>> {
     val channel = Channel<List<T>>()
 
     launch {

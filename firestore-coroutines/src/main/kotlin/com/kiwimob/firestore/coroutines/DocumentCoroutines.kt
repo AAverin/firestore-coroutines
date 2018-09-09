@@ -11,7 +11,7 @@ suspend fun <T : Any> DocumentReference.await(clazz: Class<T>): T {
     return await { documentSnapshot -> documentSnapshot.toObject(clazz) as T }
 }
 
-suspend fun <T : Any> DocumentReference.await(parser: (documentSnapshot: DocumentSnapshot) -> T): T {
+suspend fun <T : Any?> DocumentReference.await(parser: (documentSnapshot: DocumentSnapshot) -> T): T {
     return suspendCancellableCoroutine { continuation ->
         get().addOnCompleteListener {
             if (it.isSuccessful) {
