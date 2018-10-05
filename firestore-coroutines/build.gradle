@@ -34,7 +34,7 @@ kotlin {
 dependencies {
     // Kotlin
     implementation "org.jetbrains.anko:anko-coroutines:0.10.5"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.24.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.kotlin.coroutines}"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin.core}"
 
     // Firebase

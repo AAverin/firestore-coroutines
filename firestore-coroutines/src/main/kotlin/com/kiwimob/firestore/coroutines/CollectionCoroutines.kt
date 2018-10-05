@@ -7,6 +7,7 @@ import kotlinx.coroutines.experimental.channels.ReceiveChannel
 import kotlinx.coroutines.experimental.channels.sendBlocking
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.suspendCancellableCoroutine
+import kotlin.coroutines.experimental.coroutineContext
 
 suspend fun <T : Any> CollectionReference.await(clazz: Class<T>): List<T> {
     return await { documentSnapshot -> documentSnapshot.toObject(clazz) as T }
@@ -44,23 +45,21 @@ suspend fun <T : Any> Query.listen(clazz: Class<T>): ReceiveChannel<List<T>> = l
 suspend fun <T : Any> Query.listen(parser: (documentSnapshot: DocumentSnapshot) -> T): ReceiveChannel<List<T>> {
     val channel = Channel<List<T>>()
 
-    launch {
-        addSnapshotListener { querySnapshot, firebaseFirestoreException ->
-            firebaseFirestoreException?.let {
-                channel.close(it)
-                return@addSnapshotListener
-            }
-            if (querySnapshot == null) {
-                channel.close()
-                return@addSnapshotListener
-            }
-
-            val list = arrayListOf<T>()
-            querySnapshot.forEach {
-                list.add(parser.invoke(it))
-            }
-            channel.sendBlocking(list)
+    addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+        firebaseFirestoreException?.let {
+            channel.close(it)
+            return@addSnapshotListener
         }
+        if (querySnapshot == null) {
+            channel.close()
+            return@addSnapshotListener
+        }
+
+        val list = arrayListOf<T>()
+        querySnapshot.forEach {
+            list.add(parser.invoke(it))
+        }
+        channel.sendBlocking(list)
     }
 
     return channel
